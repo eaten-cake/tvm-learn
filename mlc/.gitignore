@@ -1,3 +1,4 @@
 data/
-*.pkl
+*.pkl*
 tune_tmp/
+*.so
