@@ -46,16 +46,18 @@ mod = tvm.IRModule({"matmul": matmul_func})
 sch = schedule_template(mod)
 sch.mod.show()
 
-database = ms.tune_tir(
-    mod=mod,
-    target="llvm --num-cores=1",
-    max_trials_global=10,
-    num_trials_per_iter=10,
-    # space=ms.space_generator.ScheduleFn(stochastic_schedule_mm), # annotate to use auto-scheduling
-    work_dir="./tune_tmp",
-)
 
-sch = ms.tir_integration.compile_tir(database, mod, "llvm --num-cores=1")
+
+# database = ms.tune_tir(
+#     mod=mod,
+#     target="llvm --num-cores=1",
+#     max_trials_global=10,
+#     num_trials_per_iter=10,
+#     # space=ms.space_generator.ScheduleFn(stochastic_schedule_mm), # annotate to use auto-scheduling
+#     work_dir="./tune_tmp",
+# )
+
+# sch = ms.tir_integration.compile_tir(database, mod, "llvm --num-cores=1")
 
 sch.mod.show()
 
