@@ -59,8 +59,6 @@ args = batch_matmul_relu(BATCH, N, M, K, dtype)
 func = te.create_prim_func(args).with_attr({"global_symbol": "batch_matmul_relu"})
 mod = tvm.IRModule({"batch_matmul_relu": func})
 
-print(mod.functions_items())
-
 # tvm execution
 A_tvm = tvm.nd.array(A_np, device=tvm.cpu(0))
 B_tvm = tvm.nd.array(B_np, device=tvm.cpu(0))
@@ -68,16 +66,16 @@ D_tvm = tvm.nd.array(np.empty((BATCH, N, M), dtype=dtype), device=tvm.cpu(0))
 
 sch = tvm.tir.Schedule(mod)
 
-# work_dir = "./work_dir"
-# database = ms.tune_tir(
-#     mod,
-#     "llvm --num-cores=2",
-#     work_dir,
-#     max_trials_global=64,
-#     num_trials_per_iter=64,
-# )
+work_dir = "./work_dir"
+database = ms.tune_tir(
+    mod,
+    "llvm --num-cores=1",
+    work_dir,
+    max_trials_global=64,
+    num_trials_per_iter=64,
+)
 
-# sch = ms.tir_integration.compile_tir(database, mod, target="llvm")
+sch = ms.tir_integration.compile_tir(database, mod, target="llvm")
 
 target = "llvm"
 lib = tvm.build(sch.mod, target=target)
