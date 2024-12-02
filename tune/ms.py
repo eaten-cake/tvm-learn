@@ -71,13 +71,14 @@ database = ms.tune_tir(
     mod,
     "llvm --num-cores=1",
     work_dir,
-    max_trials_global=64,
-    num_trials_per_iter=64,
+    max_trials_global=10,
+    num_trials_per_iter=10,
 )
 
-sch = ms.tir_integration.compile_tir(database, mod, target="llvm")
+target = tvm.target.Target("llvm")
 
-target = "llvm"
+sch = ms.tir_integration.compile_tir(database, mod, target)
+
 lib = tvm.build(sch.mod, target=target)
 
 lib["batch_matmul_relu"](A_tvm, B_tvm, D_tvm)
