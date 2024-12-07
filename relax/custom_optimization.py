@@ -23,19 +23,27 @@ input_shape = (1, 784)
 mod, params = RelaxModel().export_tvm({"forward": {"x": nn.spec.Tensor(input_shape, "float32")}})
 # mod.show()
 
+mod : tvm.IRModule = relax.get_pipeline("zero")(mod)
+
+mod.show()
+
+# exit(0)
+
 target = tvm.target.Target("llvm --num-cores=1")
 
-# trials = 10
+trials = 10
 
-# with tempfile.TemporaryDirectory() as work_dir, target:
-#     seq = tvm.ir.transform.Sequential([
-#         relax.get_pipeline("zero"),
-#         relax.transform.MetaScheduleTuneTIR(work_dir=work_dir, max_trials_global=trials),
-#         relax.transform.MetaScheduleApplyDatabase(work_dir=work_dir),
-#     ])
-#     mod = seq(mod)
+with target:
+    seq = tvm.ir.transform.Sequential([
+        relax.get_pipeline("zero"),
+        relax.transform.MetaScheduleTuneTIR(work_dir="./word_dir", max_trials_global=trials),
+        relax.transform.MetaScheduleApplyDatabase(work_dir="./word_dir"),
+    ])
+    mod = seq(mod)
 
-# mod.show()
+mod.show()
+
+exit(0)
 
 from tvm import dlight as dl
 
