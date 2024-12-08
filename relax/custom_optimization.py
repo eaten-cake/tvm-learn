@@ -1,9 +1,13 @@
 import os
 import tempfile
 import numpy as np
+
 import tvm
 from tvm import IRModule, relax
 from tvm.relax.frontend import nn
+from tvm.relax import transform
+from tvm import meta_schedule as ms
+from tvm.meta_schedule import Database
 
 class RelaxModel(nn.Module):
     def __init__(self):
@@ -21,17 +25,29 @@ class RelaxModel(nn.Module):
 
 input_shape = (1, 784)
 mod, params = RelaxModel().export_tvm({"forward": {"x": nn.spec.Tensor(input_shape, "float32")}})
-# mod.show()
-
-mod : tvm.IRModule = relax.get_pipeline("zero")(mod)
-
 mod.show()
-
-# exit(0)
 
 target = tvm.target.Target("llvm --num-cores=1")
 
-trials = 10
+trials = 3
+
+# mod: IRModule = relax.get_pipeline("zero")(mod)
+
+# database = ms.tune_tir(
+#     mod,
+#     target,
+#     "./work_dir",
+#     trials,
+#     max_trials_per_task=trials,
+# )
+
+database = Database.create("json", work_dir="./work_dir")
+
+mod = ms.relax_integration.compile_relax(database, mod, target)
+
+# mod = ms.tir_integration.compile_tir(database, mod, target)
+mod.show()
+exit(0)
 
 with target:
     seq = tvm.ir.transform.Sequential([
