@@ -66,17 +66,6 @@ D_tvm = tvm.nd.array(np.empty((BATCH, N, M), dtype=dtype), device=tvm.cpu(0))
 
 sch = tvm.tir.Schedule(mod)
 
-# mod.show()
-
-# compute_block = sch.get_block("compute", "batch_matmul_relu")
-# batch, i, j = sch.get_loops(compute_block)
-# j0, j1 = sch.split(j, factors=[None, 16])
-
-# print(sch.trace)
-
-# exit(0)
-
-
 work_dir = "./work_dir"
 database = ms.tune_tir(
     mod,
