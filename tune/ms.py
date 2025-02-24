@@ -69,10 +69,10 @@ sch = tvm.tir.Schedule(mod)
 work_dir = "./work_dir"
 database = ms.tune_tir(
     mod,
-    "llvm --num-cores=1",
+    "llvm -num-cores=1",
     work_dir,
-    max_trials_global=10,
-    num_trials_per_iter=10,
+    max_trials_global=1,
+    num_trials_per_iter=1,
 )
 
 target = tvm.target.Target("llvm")
